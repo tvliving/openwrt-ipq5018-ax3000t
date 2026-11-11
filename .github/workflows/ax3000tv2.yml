@@ -110,6 +110,8 @@ jobs:
           cat > .config <<EOF
           CONFIG_TARGET_qualcommax=y
           CONFIG_TARGET_qualcommax_ipq50xx=y
+          # 设备符号 depends on TARGET_MULTI_PROFILE，不开这个 TARGET_DEVICE_* 会被 Kconfig 隐藏
+          CONFIG_TARGET_MULTI_PROFILE=y
           CONFIG_TARGET_DEVICE_qualcommax_ipq50xx_DEVICE_xiaomi_ax3000tv2=y
           CONFIG_TARGET_ROOTFS_INITRAMFS=y
           CONFIG_PACKAGE_luci=y
