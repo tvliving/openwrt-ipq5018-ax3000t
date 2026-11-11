@@ -101,7 +101,9 @@ jobs:
       - name: 更新并安装 feeds
         run: |
           ./scripts/feeds update -a
-          ./scripts/feeds install -a
+          # 只安装 luci 及其依赖；不要全量 install -a，
+          # 否则会拉入 video feed 的 qt5/qt6，其 Config.in 存在递归依赖错误导致 defconfig 失败
+          ./scripts/feeds install luci
 
       - name: 生成 .config（AX3000T v2 + LuCI + initramfs）
         run: |
