@@ -108,17 +108,22 @@ jobs:
       - name: 生成 .config（AX3000T v2 + LuCI + initramfs）
         run: |
           cat > .config <<EOF
-          CONFIG_TARGET_QUALCOMMAX=y
-          CONFIG_TARGET_QUALCOMMAX_IPQ50XX=y
-          CONFIG_TARGET_DEVICE_QUALCOMMAX_IPQ50XX_DEVICE_XIAOMI_AX3000TV2=y
+          CONFIG_TARGET_qualcommax=y
+          CONFIG_TARGET_qualcommax_ipq50xx=y
+          CONFIG_TARGET_DEVICE_qualcommax_ipq50xx_DEVICE_xiaomi_ax3000tv2=y
           CONFIG_TARGET_ROOTFS_INITRAMFS=y
           CONFIG_PACKAGE_luci=y
           CONFIG_CCACHE=y
           EOF
           make defconfig
+          # 兜底：若机型符号仍未翻 y，定向翻转后二次 defconfig
+          if ! grep -q '^CONFIG_TARGET_DEVICE_qualcommax_ipq50xx_DEVICE_xiaomi_ax3000tv2=y' .config; then
+            sed -i 's/^# \(CONFIG_TARGET_DEVICE_qualcommax_ipq50xx_DEVICE_xiaomi_ax3000tv2\) is not set$/\1=y/' .config
+            make defconfig
+          fi
           echo "===== 关键符号核对 ====="
-          grep -E 'CONFIG_TARGET_DEVICE_QUALCOMMAX_IPQ50XX_DEVICE_XIAOMI_AX3000TV2=|CONFIG_TARGET_ROOTFS_INITRAMFS=|CONFIG_PACKAGE_luci=' .config
-          grep -q '^CONFIG_TARGET_DEVICE_QUALCOMMAX_IPQ50XX_DEVICE_XIAOMI_AX3000TV2=y' .config \
+          grep -E 'CONFIG_TARGET_DEVICE_qualcommax_ipq50xx_DEVICE_xiaomi_ax3000tv2=|CONFIG_TARGET_ROOTFS_INITRAMFS=|CONFIG_PACKAGE_luci=' .config
+          grep -q '^CONFIG_TARGET_DEVICE_qualcommax_ipq50xx_DEVICE_xiaomi_ax3000tv2=y' .config \
             || { echo "::error::机型符号未生效"; exit 1; }
           grep -q '^CONFIG_TARGET_ROOTFS_INITRAMFS=y' .config \
             || { echo "::error::initramfs 未生效（首刷镜像会缺失）"; exit 1; }
